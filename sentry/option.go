@@ -1,7 +1,7 @@
 package sentrygrpc
 
 var (
-	defaultOptions = &options{
+	defaultOptions = options{
 		report: true,
 	}
 )
@@ -13,12 +13,11 @@ type options struct {
 }
 
 func evaluateOptions(opts ...Option) *options {
-	optCopy := &options{}
-	*optCopy = *defaultOptions
+	optCopy := defaultOptions
 	for _, o := range opts {
-		o(optCopy)
+		o(&optCopy)
 	}
-	return optCopy
+	return &optCopy
 }
 
 // Pass false when you don't want to report error to sentry(e.g. local environment)
