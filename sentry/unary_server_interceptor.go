@@ -23,7 +23,9 @@ import (
 // so `RecoverWithContext` and `CaptureException` gets executed as fast as possible
 // inside the interceptor chain.(defer and logics after `handler` are executed reversibly)
 //
-func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
+func UnaryServerInterceptor(options ...Option) grpc.UnaryServerInterceptor {
+	opts := evaluateOptions(options...)
+
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -38,7 +40,9 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		defer func() {
 			if r := recover(); r != nil {
-				hub.RecoverWithContext(ctx, r)
+				if opts.report {
+					hub.RecoverWithContext(ctx, r)
+				}
 
 				panic(r)
 			}
@@ -46,7 +50,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		resp, err = handler(ctx, req)
 
-		if err != nil {
+		if err != nil && opts.report {
 			hub.CaptureException(err)
 		}
 

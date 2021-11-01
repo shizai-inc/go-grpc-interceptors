@@ -40,9 +40,10 @@ func setUp(
 	handler func(context.Context, *grpchealth.HealthCheckRequest) (
 		*grpchealth.HealthCheckResponse, error,
 	),
+	option []sentrygrpc.Option,
 ) {
 	server := grpc.NewServer(
-		grpc.UnaryInterceptor(sentrygrpc.UnaryServerInterceptor()),
+		grpc.UnaryInterceptor(sentrygrpc.UnaryServerInterceptor(option...)),
 	)
 	grpchealth.RegisterHealthServer(
 		server,
@@ -80,6 +81,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	for _, tt := range []struct {
 		name    string
 		ctx     context.Context
+		opts    []sentrygrpc.Option
 		handler func(
 			context.Context,
 			*grpchealth.HealthCheckRequest,
@@ -122,6 +124,21 @@ func TestUnaryServerInterceptor(t *testing.T) {
 			},
 		},
 		{
+			name: "does not report when report flag is false",
+			ctx:  context.Background(),
+			opts: []sentrygrpc.Option{
+				sentrygrpc.Report(false),
+			},
+			handler: func(
+				context.Context,
+				*grpchealth.HealthCheckRequest,
+			) (*grpchealth.HealthCheckResponse, error) {
+				return nil, status.Error(codes.NotFound, "not found")
+			},
+			code:   codes.NotFound,
+			events: nil,
+		},
+		{
 			name: "sets hub on context",
 			ctx:  context.Background(),
 			handler: func(
@@ -152,7 +169,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 				log.Fatalf("sentry.Init error: %s", err)
 			}
 
-			setUp(tt.handler)
+			setUp(tt.handler, tt.opts)
 			defer tearDown()
 
 			client := grpchealth.NewHealthClient(conn)
