@@ -96,7 +96,8 @@ func TestUnaryServerInterceptor(t *testing.T) {
 			) (*grpchealth.HealthCheckResponse, error) {
 				return &grpchealth.HealthCheckResponse{}, nil
 			},
-			code: codes.OK,
+			code:   codes.OK,
+			events: nil,
 		},
 		{
 			name: "reports when handler returns error",
