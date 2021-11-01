@@ -21,6 +21,7 @@ func evaluateOptions(opts []Option) *options {
 	return optCopy
 }
 
+// Pass false when you don't want to report error to sentry(e.g. local environment)
 func Report(report bool) Option {
 	return func(o *options) {
 		o.report = report
