@@ -20,7 +20,8 @@ import (
 //     )
 //
 // As above, you would always want to pass this interceptors in the latter part
-// so `RecoverWithContext` and `CaptureException` gets executed as fast as possible// inside the interceptor chain.(defer and logics after `handler` are executed reversibly)
+// so `RecoverWithContext` and `CaptureException` gets executed as fast as possible
+// inside the interceptor chain.(defer and logics after `handler` are executed reversibly)
 //
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(
