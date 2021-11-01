@@ -24,7 +24,7 @@ import (
 // inside the interceptor chain.(defer and logics after `handler` are executed reversibly)
 //
 func UnaryServerInterceptor(options ...Option) grpc.UnaryServerInterceptor {
-	opts := evaluateOptions(options)
+	opts := evaluateOptions(options...)
 
 	return func(
 		ctx context.Context,
