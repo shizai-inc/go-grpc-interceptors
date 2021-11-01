@@ -12,7 +12,7 @@ type options struct {
 	report bool
 }
 
-func evaluateOptions(opts []Option) *options {
+func evaluateOptions(opts ...Option) *options {
 	optCopy := &options{}
 	*optCopy = *defaultOptions
 	for _, o := range opts {
